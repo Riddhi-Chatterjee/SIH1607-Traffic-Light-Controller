@@ -381,7 +381,7 @@ class RoadIntersectionEnv(gym.Env):
         
         # Path to SUMO binary
         self.sumoBinary = "/usr/bin/sumo"
-        self.sumoCmd = [self.sumoBinary, "-c", "/usr/share/sumo/tools/game/fkk_in.sumocfg"]
+        self.sumoCmd = [self.sumoBinary, "--time-to-teleport=-1", "-c", "/usr/share/sumo/tools/game/fkk_in.sumocfg"]
         
         # Start the SUMO simulation
         if not self.randomised_starts:
