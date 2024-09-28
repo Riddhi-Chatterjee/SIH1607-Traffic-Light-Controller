@@ -32,5 +32,6 @@ Weighted sum of following factors has been considered as reward function
 
 The state-space and reward-function have elements like **priority grid** to support emergency vehicles and **Pollutants emission rates** to reduce pollution.
 
-
+## Real-time monitoring
+The other novel aspect of our RL agent is it can fetch the factors of state-space and reward function using the state-of-the-art object detection model **YOLOv8** along with **DeepSORT** algorithm for object tracking in real-time. All it needs is a good camera at traffic junction!
 
