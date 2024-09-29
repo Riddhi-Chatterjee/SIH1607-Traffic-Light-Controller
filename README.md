@@ -54,7 +54,7 @@ The RL agent uses a reward function to guide learning, balancing traffic efficie
 - **Priority Vehicle Queue Length**: Penalizes long queues of priority vehicles in each lane to facilitate their movement. [Goal: Reduce]
 - **Normal Vehicle Queue Length**: Penalizes long queues of normal vehicles in each lane to minimize congestion. [Goal: Reduce]
 
-### Action Space Formulation
+### Action Space Formulation 
 
 ## Key Features
 - **Novel State Space and Reward Formulation**: The system uses a unique state representation that captures traffic dynamics, including vehicle count, speed, acceleration, waiting time, priority vehicles, and pedestrians.
