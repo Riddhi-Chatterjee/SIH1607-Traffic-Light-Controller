@@ -33,28 +33,28 @@ The RL agent receives a comprehensive representation of the current traffic scen
 ### Reward Function Formulation
 The RL agent uses a reward function to guide learning, balancing traffic efficiency and safety. The components of the reward function include:
 
-- **Sudden Phase Change**: Penalizes phase changes that occur too quickly, below the minimum duration allowed for that type of phase. Minimum durations are adapted based on visibility conditions to prevent accidents in low visibility. All types of phase changes are now monitored to ensure consistency. [Goal: Reduce]
-- **Slow Phase Change**: Penalizes phase changes that occur too slowly, exceeding the maximum duration allowed. Maximum durations are visibility-dependent to ensure traffic remains responsive. [Goal: Reduce]
-- **Noise Emission**: Penalizes lanes whose noise emission exceeds the permissible limits set by the Central Pollution Control Board (CPCB) of India. The permissible limits are:
+- **Sudden Phase Change**: Indicates phase changes that occur too quickly, below the minimum duration allowed for that type of phase. Minimum durations are adapted based on visibility conditions to prevent accidents in low visibility. [Goal: Reduce]
+- **Slow Phase Change**: Indicates phase changes that occur too slowly, exceeding the maximum duration allowed. Maximum durations are visibility-dependent to ensure traffic remains responsive. [Goal: Reduce]
+- **Noise Emission**: Total number of incoming lanes whose noise emission exceeds the permissible limits set by the Central Pollution Control Board (CPCB) of India. The permissible limits are:
   - Industrial areas: 75 dB (daytime), 70 dB (nighttime)
   - Commercial areas: 65 dB (daytime), 55 dB (nighttime)
   - Residential areas: 55 dB (daytime), 45 dB (nighttime)
 
-  Phase durations may be adjusted to minimize noise, especially during nighttime in residential areas. [Goal: Reduce]
-- **Environmental Cost**: Penalizes the environmental impact by summing CO2, CO, HC, NOx, and PMx emission rates (in mg/s) across all lanes. [Goal: Reduce]
-- **Intermediate Halt**: Penalizes entities (vehicles and pedestrians) that halt while crossing an intersection, as it often indicates a near-collision or inefficient traffic flow. A speed below 0.1 m/s is considered a halt. This is heavily penalized to encourage uninterrupted movement. [Goal: Reduce]
-- **Collision**: Penalizes collisions involving vehicles and/or pedestrians to ensure safety. [Goal: Reduce]
-- **Pedestrian Waiting Time**: Penalizes prolonged waiting times for pedestrians in all lanes, calculated using the revised waiting time definition. [Goal: Reduce]
-- **Priority Vehicle Waiting Time**: Penalizes waiting times for priority vehicles (e.g., ambulances, fire trucks) in all lanes. The waiting time is lane-dependent to prioritize emergency response appropriately. [Goal: Reduce]
-- **Normal Vehicle Waiting Time**: Penalizes waiting times for normal vehicles in all lanes. The revised lane-dependent waiting time ensures precision. [Goal: Reduce]
-- **Priority Vehicle Speed**: Rewards maintaining or increasing the average speed of priority vehicles across all lanes. [Goal: Increase]
-- **Normal Vehicle Speed**: Rewards maintaining or increasing the average speed of normal vehicles across all lanes. [Goal: Increase]
-- **Pedestrian Speed**: Rewards maintaining or increasing the average speed of pedestrians across all lanes. [Goal: Increase]
-- **Pedestrian Queue Length**: Penalizes long pedestrian queues in each lane to minimize pedestrian delays. [Goal: Reduce]
-- **Priority Vehicle Queue Length**: Penalizes long queues of priority vehicles in each lane to facilitate their movement. [Goal: Reduce]
-- **Normal Vehicle Queue Length**: Penalizes long queues of normal vehicles in each lane to minimize congestion. [Goal: Reduce]
+  Phase durations should be adjusted to minimize noise, especially during nighttime in residential areas. [Goal: Reduce]
+- **Environmental Cost**: Sum of CO2, CO, HC, NOx, and PMx emission rates (in mg/s) of entities in all the incoming lanes. [Goal: Reduce]
+- **Intermediate Halt**: Indicates scenarios where entities (vehicles or pedestrians) halt while crossing an intersection, as it often indicates a near-collision or inefficient traffic flow. A speed below 0.1 m/s is considered a halt. This is heavily penalized to encourage uninterrupted movement. [Goal: Reduce]
+- **Collision**: Number of collisions involving vehicles and/or pedestrians to ensure safety. [Goal: Reduce]
+- **Pedestrian Waiting Time**: Sum of waiting times of pedestrians in all the incoming pedestrian lanes. [Goal: Reduce]
+- **Priority Vehicle Waiting Time**: Sum of waiting times of priority vehicles in all the incoming vehicle lanes. [Goal: Reduce]
+- **Normal Vehicle Waiting Time**: Sum of waiting times of normal vehicles in all the incoming vehicle lanes. [Goal: Reduce]
+- **Priority Vehicle Speed**: Average speed of priority vehicles in all the incoming vehicle lanes. [Goal: Increase]
+- **Normal Vehicle Speed**: Average speed of normal vehicles in all the incoming vehicle lanes. [Goal: Increase]
+- **Pedestrian Speed**: Average speed of pedestrian in all the incoming pedestrian lanes. [Goal: Increase]
+- **Pedestrian Queue Length**: Sum of pedestrian queue lengths of each incoming pedestrian lane. [Goal: Reduce]
+- **Priority Vehicle Queue Length**: Sum of priority vehicle queue lengths of each incoming vehicle lane. [Goal: Reduce]
+- **Normal Vehicle Queue Length**: Sum of normal vehicle queue lengths of each incoming vehicle lane. [Goal: Reduce]
 
-### Action Space Formulation 
+### Action Space Formulation
 
 ## Key Features
 - **Novel State Space and Reward Formulation**: The system uses a unique state representation that captures traffic dynamics, including vehicle count, speed, acceleration, waiting time, priority vehicles, and pedestrians.
