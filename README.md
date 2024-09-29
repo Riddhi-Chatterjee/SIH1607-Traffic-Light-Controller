@@ -1,37 +1,105 @@
-# AI Based Traffic Light Controller
+# Reinforcement Learning based Traffic Light Controller
 
-## Description
-To tackle the traffic issues in urban areas, we have proposed a smart **Reinforcement Learning(RL)** based traffic light controller capable of **real-time monitoring** of traffic conditions and **adaptation of traffic light timings** accordingly. 
+## Overview
+A Reinforcement Learning (RL) based traffic light control system aimed at managing routes with heavy traffic from different directions. It uses real-time monitoring and dynamic adjustment of traffic light timings to minimize waiting times, reduce emissions, and improve traffic flow efficiency. This project is being developed for Smart India Hackathon 2024, under problem statement ID 1607.
 
-## Algorithm
-We have used Soft Actor Critic algorithm for developing the RL agent which involves training for multiple episodes with a novel state space and reward function. Extensive research has been conducted to develop state spaces and reward functions for designing a reinforcement learning-based agent that not only ensures a smooth traffic experience but also promotes eco-friendly practices. For training purposes, SUMO(Simulation Of Urban MObility), a traffic simulator has been used.
+## The Reinforcement Learning Formulation
 
-### State Space
-- Number of vehicles in lanes
-- Vehicle position, speed and acceleration values
-- Waiting time of vehicles
-- Priority vehicle indicator grid
-- Similar factors for pedestrians
-- Current traffic light phase
-- Upcoming traffic light phase
-- Time since last phase change
-- Visibiliy (in km)
-- Daytime
+The task of traffic management at road intersections is modelled as a Reinforcement Learning task by depicting traffic conditions as accurately as possible to act as a novel state space, coming up with a novel reward function to act as an effective feedback mechanism for the RL agent, and setting the action space according to the desired level of agent autonomy.
 
-### Reward Function
-Weighted sum of following factors has been considered as reward function
-- Queue Length
-- Speed of vehicles
-- Waiting time of vehicles
-- Priority vehicles
-- Pedestrians
-- Sum of CO2, CO, HC, NOx and PMx emission rates
-- Noise emission
-- Collision indicator
-- Sudden or slow phase changes
+### State Space Formulation
+The RL agent receives a comprehensive representation of the current traffic scenario, encoded in the following state variables:
 
-The state-space and reward-function have elements like **priority grid** to support emergency vehicles and **Pollutants emission rates** to reduce pollution.
+- **Total number of vehicles (halted + moving) in each lane**: Vector of dimension (num_vehicle_lanes, ).
+- **Number of halted vehicles in each lane**: Vector of dimension (num_vehicle_lanes, ).
+- **Sum of waiting times of normal vehicles in each lane**: Vector of dimension (num_vehicle_lanes, ). Waiting time is lane-dependent and defined as the time measured from when a vehicle first stops in that lane until it either leaves that lane (for outgoing lanes) or enters an outgoing lane (for incoming lanes).
+- **Sum of waiting times of priority vehicles in each lane**: Vector of dimension (num_vehicle_lanes, ). The same waiting time definition also applies here, ensuring accurate lane-specific measurements.
+- **Vehicle position grid**: A binary image/grid representing the positions of vehicles.
+- **Vehicle speed grid**: An image/grid representation of vehicle speeds (all elements are non-negative).
+- **Vehicle acceleration grid**: An image/grid representation of vehicle accelerations (positive for speed increase, negative for decrease).
+- **Priority vehicle indicator grid**: A binary image/grid representing the positions of priority vehicles (e.g., emergency vehicles).
+- **Total number of pedestrians (halted + moving) in each lane**: Vector of dimension (num_pedestrian_lanes, ).
+- **Number of halted pedestrians in each lane**: Vector of dimension (num_pedestrian_lanes, ).
+- **Sum of waiting times of pedestrians in each lane**: Vector of dimension (num_pedestrian_lanes, ). Waiting time is defined similarly for pedestrians, from when they first halt until they leave or enter an outgoing lane.
+- **Pedestrian position grid**: A binary image/grid representing the positions of pedestrians.
+- **Pedestrian speed grid**: An image/grid representation of pedestrian speeds (all elements are non-negative).
+- **Pedestrian acceleration grid**: An image/grid representation of pedestrian accelerations (positive for speed increase, negative for decrease).
+- **Current traffic light phase**: Current phase of the traffic light system.
+- **Next traffic light phase**: Next planned phase of the traffic light system. (This is part of the state space only for an autonomous level-1 agent. The next phase is part of the action space for an autonomous level-2 agent, and thus is predicted by the agent itself)
+- **Time since last phase change**: A single value indicating how long the current phase has been active.
+- **Visibility (in kilometers)**: A single value indicating the current visibility conditions. Poor visibility may require longer light phases to give vehicles and pedestrians extra time to react.
+- **Daytime indicator**: A binary flag indicating daytime (1 for daytime, 0 for nighttime).
 
-## Real-time monitoring
-The other novel aspect of our RL agent is it can fetch the factors of state-space and reward function using the state-of-the-art object detection model **YOLOv8** along with **DeepSORT** algorithm for object tracking in real-time. All it needs is a good camera at traffic junction!
+### Reward Function Formulation
+The RL agent uses a reward function to guide learning, balancing traffic efficiency and safety. The components of the reward function include:
 
+- **Sudden Phase Change**: Penalizes phase changes that occur too quickly, below the minimum duration allowed for that type of phase. Minimum durations are adapted based on visibility conditions to prevent accidents in low visibility. All types of phase changes are now monitored to ensure consistency. [Goal: Reduce]
+- **Slow Phase Change**: Penalizes phase changes that occur too slowly, exceeding the maximum duration allowed. Maximum durations are visibility-dependent to ensure traffic remains responsive. [Goal: Reduce]
+- **Noise Emission**: Penalizes lanes whose noise emission exceeds the permissible limits set by the Central Pollution Control Board (CPCB) of India. The permissible limits are:
+  - Industrial areas: 75 dB (daytime), 70 dB (nighttime)
+  - Commercial areas: 65 dB (daytime), 55 dB (nighttime)
+  - Residential areas: 55 dB (daytime), 45 dB (nighttime)
+
+  Phase durations may be adjusted to minimize noise, especially during nighttime in residential areas. [Goal: Reduce]
+- **Environmental Cost**: Penalizes the environmental impact by summing CO2, CO, HC, NOx, and PMx emission rates (in mg/s) across all lanes. [Goal: Reduce]
+- **Intermediate Halt**: Penalizes entities (vehicles and pedestrians) that halt while crossing an intersection, as it often indicates a near-collision or inefficient traffic flow. A speed below 0.1 m/s is considered a halt. This is heavily penalized to encourage uninterrupted movement. [Goal: Reduce]
+- **Collision**: Penalizes collisions involving vehicles and/or pedestrians to ensure safety. [Goal: Reduce]
+- **Pedestrian Waiting Time**: Penalizes prolonged waiting times for pedestrians in all lanes, calculated using the revised waiting time definition. [Goal: Reduce]
+- **Priority Vehicle Waiting Time**: Penalizes waiting times for priority vehicles (e.g., ambulances, fire trucks) in all lanes. The waiting time is lane-dependent to prioritize emergency response appropriately. [Goal: Reduce]
+- **Normal Vehicle Waiting Time**: Penalizes waiting times for normal vehicles in all lanes. The revised lane-dependent waiting time ensures precision. [Goal: Reduce]
+- **Priority Vehicle Speed**: Rewards maintaining or increasing the average speed of priority vehicles across all lanes. [Goal: Increase]
+- **Normal Vehicle Speed**: Rewards maintaining or increasing the average speed of normal vehicles across all lanes. [Goal: Increase]
+- **Pedestrian Speed**: Rewards maintaining or increasing the average speed of pedestrians across all lanes. [Goal: Increase]
+- **Pedestrian Queue Length**: Penalizes long pedestrian queues in each lane to minimize pedestrian delays. [Goal: Reduce]
+- **Priority Vehicle Queue Length**: Penalizes long queues of priority vehicles in each lane to facilitate their movement. [Goal: Reduce]
+- **Normal Vehicle Queue Length**: Penalizes long queues of normal vehicles in each lane to minimize congestion. [Goal: Reduce]
+
+### Action Space Formulation
+
+## Key Features
+- **Novel State Space and Reward Formulation**: The system uses a unique state representation that captures traffic dynamics, including vehicle count, speed, acceleration, waiting time, priority vehicles, and pedestrians.
+- **Soft Actor Critic RL Algorithm**: The SAC algorithm ensures efficient exploration by incorporating entropy-based optimization, allowing the agent to adapt dynamically.
+- **Real-Time Traffic Monitoring**: Factors such as time of day, weather, harmful emissions, and collision events are also integrated to make accurate decisions.
+
+## Innovation and Uniqueness
+- **50% Reduction in Waiting Times**: The RL-based system demonstrates a significant reduction in vehicle waiting times and environmental costs compared to traditional, preset traffic light systems.
+- **No Human Intervention**: The RL agent operates autonomously, making real-time decisions to change traffic light phases as necessary.
+- **Scalable and Technologically Mature**: The approach can easily be extended to multiple intersections through Multi-Agent RL, leveraging established frameworks like SUMO, PyTorch, YOLO, and DeepSort.
+
+## Technical Approach
+### RL Training
+- **Simulator**: SUMO (Simulation of Urban MObility)
+- **Frameworks and Tools**: 
+  - PyTorch, stable_baselines3 (for RL algorithm), OpenAI Gym for training
+  - Python programming language
+
+### Real-World Integration
+- **Hardware Requirements**: Aerial view camera mounted at road intersections, and a computational device with capabilities similar to an average modern laptop.
+- **Software Requirements**: 
+  - Pre-trained SAC RL model for controlling traffic lights.
+  - YOLO-v8 and DeepSort for real-time traffic data extraction.
+  - PyTorch and stable_baselines3 for inference and adaptation.
+
+### Development Status
+- The RL algorithm has been prototyped and tested on simulated traffic data using SUMO.
+- Real-world integration with YOLO and DeepSort models is 70% complete.
+
+## Feasibility and Scalability
+- **Seamless Integration**: Only an overhead camera and a computational device are needed.
+- **Scalability**: Multi-agent RL capabilities allow managing multiple intersections efficiently.
+- **Technological Maturity**: The use of well-established algorithms and frameworks supports real-world feasibility.
+
+## Challenges and Strategies
+- **Testing and Fine-Tuning**: The prototype is trained on 10+ hours of simulated traffic data but requires more extensive testing before full deployment.
+- **Handling Sudden Traffic Events**: Future improvements include training on simulated scenarios involving accidents and road closures.
+
+## Impact and Benefits
+- **Social Impact**: Reduction in traffic-related stress, shorter waiting times, and improved quality of life for commuters.
+- **Economic Benefits**: Lower fuel consumption, reduced logistics costs, and less vehicle wear and tear.
+- **Environmental Benefits**: Decreased emissions of pollutants like CO2 and NOx, contributing to cleaner air in urban areas.
+- **Safety**: Improved traffic flow reduces the likelihood of collisions, enhancing road safety.
+
+## References
+1. [IntelliLight: A Reinforcement Learning Approach for Intelligent Traffic Light Control](https://dl.acm.org/doi/10.1145/3219819.3220096)
+2. [SUMO Documentation](https://sumo.dlr.de/docs/index.html)
+3. [YOLO Ultralytics](https://docs.ultralytics.com/modes/track/)
