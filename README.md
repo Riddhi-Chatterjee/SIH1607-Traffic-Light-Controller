@@ -5,7 +5,7 @@ A Reinforcement Learning (RL) based traffic light control system aimed at managi
 
 ## The Reinforcement Learning Formulation
 
-The task of traffic management at road intersections is modelled as a Reinforcement Learning task by depicting traffic conditions as accurately as possible to act as a novel state space, coming up with a novel reward function to act as an effective feedback mechanism for the RL agent, and setting the action space according to the desired level of agent autonomy.
+The task of traffic management at road intersections is modelled as a Reinforcement Learning task by depicting traffic conditions as accurately as possible to act as a novel state space, coming up with a novel reward function to act as an effective feedback mechanism for the RL agent, and setting the action space according to the desired level of agent autonomy. For developing the RL agent, the state-of-the-art Soft Actor Critic RL algorithm has been used which incorporates automatic entropy based exploration factor.
 
 ### State Space Formulation
 The RL agent receives a comprehensive representation of the current traffic scenario, encoded in the following state variables:
@@ -55,18 +55,27 @@ The RL agent uses a reward function to guide learning, balancing traffic efficie
 - **Normal Vehicle Queue Length**: Sum of normal vehicle queue lengths of each incoming vehicle lane. [Goal: Reduce]
 
 ### Action Space Formulation
+Modelling of the action space of the RL agent can be done in 3 possible ways which decides the level of autonomy the agent has while managing traffic:
+- **Autonomous Level 1**: Here we manually decide the traffic light phases as well as a periodic cycle of phases that is to be followed by the agent. Each traffic light phase is an encoding of the various traffic lights in the road intersection. For example: Hypothetically, if there are only 4 traffic lights in the road intersection, then one of the traffic light phases might be: "red for the first two lights and green for the remaining two lights". At every time instant, the RL agent takes a binary action:
+- - **action = 1**: Change the traffic light phase to the pre-defined "next phase" in the phase cycle.
+- - **action = 0**: Keep the traffic light phase as it is.
+- **Autonomous Level 2**: Here we manually decide the traffic light phases only. At every time instant, the RL agent predicts the next traffic light phase, which can either be same as the current traffic light phase, or a different one.
+- **Autonomous Level 3**: This is the highest level of autonomy the RL agent can be given, where there is no manual intervention. The RL agent is free to control each individual "traffic light" separately. Thus, at every time instant, the RL agent predicts an encoding of the traffic lights at the road intersection, which acts as the next traffic light phase -- this can either be same as the current traffic light phase, or a different one.
 
-## Key Features
-- **Novel State Space and Reward Formulation**: The system uses a unique state representation that captures traffic dynamics, including vehicle count, speed, acceleration, waiting time, priority vehicles, and pedestrians.
-- **Soft Actor Critic RL Algorithm**: The SAC algorithm ensures efficient exploration by incorporating entropy-based optimization, allowing the agent to adapt dynamically.
-- **Real-Time Traffic Monitoring**: Factors such as time of day, weather, harmful emissions, and collision events are also integrated to make accurate decisions.
+With increasing level of RL agent autonomy, training becomes significantly challenging -- we need to train for prolonged durations and enforce certain restrictions on the RL agent. 
 
-## Innovation and Uniqueness
-- **50% Reduction in Waiting Times**: The RL-based system demonstrates a significant reduction in vehicle waiting times and environmental costs compared to traditional, preset traffic light systems.
-- **No Human Intervention**: The RL agent operates autonomously, making real-time decisions to change traffic light phases as necessary.
-- **Scalable and Technologically Mature**: The approach can easily be extended to multiple intersections through Multi-Agent RL, leveraging established frameworks like SUMO, PyTorch, YOLO, and DeepSort.
+## Key aspects of this project
+- **More than 50% reduction** in traffic waiting times and
+environmental cost as compared to traditional pre-set
+timing based traffic light control mechanisms.
+- **No human intervention needed**: The RL agent changes
+the traffic light phase as and when needed.
+- **Novel modelling** of weather factors, state space and
+reward function – helps train the agent in highly
+realistic data
+- **Real world integration**: YOLO-v8 and DeepSort models are used to extract real-time real-world traffic data, which is then fed into our pre-trained RL agent to manage traffic.
 
-## Technical Approach
+## Software and Hardware Requirements 
 ### RL Training
 - **Simulator**: SUMO (Simulation of Urban MObility)
 - **Frameworks and Tools**: 
