@@ -57,8 +57,8 @@ The RL agent uses a reward function to guide learning, balancing traffic efficie
 ### Action Space Formulation
 Modelling of the action space of the RL agent can be done in 3 possible ways which decides the level of autonomy the agent has while managing traffic:
 - **Autonomous Level 1**: Here we manually decide the traffic light phases as well as a periodic cycle of phases that is to be followed by the agent. Each traffic light phase is an encoding of the various traffic lights in the road intersection. For example: Hypothetically, if there are only 4 traffic lights in the road intersection, then one of the traffic light phases might be: "red for the first two lights and green for the remaining two lights". At every time instant, the RL agent takes a binary action:
-- - **action = 1**: Change the traffic light phase to the pre-defined "next phase" in the phase cycle.
-- - **action = 0**: Keep the traffic light phase as it is.
+  - **action = 1**: Change the traffic light phase to the pre-defined "next phase" in the phase cycle.
+  - **action = 0**: Keep the traffic light phase as it is.
 - **Autonomous Level 2**: Here we manually decide the traffic light phases only. At every time instant, the RL agent predicts the next traffic light phase, which can either be same as the current traffic light phase, or a different one.
 - **Autonomous Level 3**: This is the highest level of autonomy the RL agent can be given, where there is no manual intervention. The RL agent is free to control each individual "traffic light" separately. Thus, at every time instant, the RL agent predicts an encoding of the traffic lights at the road intersection, which acts as the next traffic light phase -- this can either be same as the current traffic light phase, or a different one.
 
