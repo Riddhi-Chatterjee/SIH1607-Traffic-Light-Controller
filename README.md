@@ -75,38 +75,40 @@ reward function – helps train the agent in highly
 realistic data
 - **Real world integration**: YOLO-v8 and DeepSort models are used to extract real-time real-world traffic data, which is then fed into our pre-trained RL agent to manage traffic.
 
-## Software and Hardware Requirements 
-### RL Training
-- **Simulator**: SUMO (Simulation of Urban MObility)
-- **Frameworks and Tools**: 
-  - PyTorch, stable_baselines3 (for RL algorithm), OpenAI Gym for training
-  - Python programming language
+## Requirements 
+### RL Algorithm Training and Evaluation on Simulated Traffic Data:
+- **Traffic simulator**: SUMO –
+Simulation of Urban MObility
+- **Frameworks**: PyTorch,
+stable_baselines3 (for RL algorithm),
+OpenAI Gym
+- **Programming language**: Python
 
-### Real-World Integration
+### RL Algorithm Inference/Usage in Real-World Scenario:
 - **Hardware Requirements**: Aerial view camera mounted at road intersections, and a computational device with capabilities similar to an average modern laptop.
 - **Software Requirements**: 
-  - Pre-trained SAC RL model for controlling traffic lights.
-  - YOLO-v8 and DeepSort for real-time traffic data extraction.
-  - PyTorch and stable_baselines3 for inference and adaptation.
-
-### Development Status
-- The RL algorithm has been prototyped and tested on simulated traffic data using SUMO.
-- Real-world integration with YOLO and DeepSort models is 70% complete.
+  - Our Pre-trained Soft Actor Critic RL model for controlling traffic lights.
+  - YOLO-v8 and DeepSort for real-time traffic data extraction from a real-world setting.
+  - Frameworks -- PyTorch, stable_baselines3 (for RL algorithm) and OpenAI Gym.
+  - Programming language -- Python
 
 ## Feasibility and Scalability
 - **Seamless Integration**: Only an overhead camera and a computational device are needed.
 - **Scalability**: Multi-agent RL capabilities allow managing multiple intersections efficiently.
 - **Technological Maturity**: The use of well-established algorithms and frameworks supports real-world feasibility.
 
-## Challenges and Strategies
-- **Testing and Fine-Tuning**: The prototype is trained on 10+ hours of simulated traffic data but requires more extensive testing before full deployment.
-- **Handling Sudden Traffic Events**: Future improvements include training on simulated scenarios involving accidents and road closures.
-
 ## Impact and Benefits
 - **Social Impact**: Reduction in traffic-related stress, shorter waiting times, and improved quality of life for commuters.
 - **Economic Benefits**: Lower fuel consumption, reduced logistics costs, and less vehicle wear and tear.
 - **Environmental Benefits**: Decreased emissions of pollutants like CO2 and NOx, contributing to cleaner air in urban areas.
 - **Safety**: Improved traffic flow reduces the likelihood of collisions, enhancing road safety.
+
+## Project R&D Status
+- A prototype of the autonomous-level-1 SAC RL agent has been developed and trained for 2.5 days.
+- A prototype of the autonomous-level-2 SAC RL agent has been developed and is currently being trained.
+- Work on the development of the autonomous-level-3 SAC RL agent is yet to begin and would commence after the successful training of the autonomous-level-2 agent.
+- Real-world integration using YOLO and DeepSort models is 70% complete.
+- Future improvements include, training on simulated scenarios involving accidents and road closures.
 
 ## References
 1. [IntelliLight: A Reinforcement Learning Approach for Intelligent Traffic Light Control](https://dl.acm.org/doi/10.1145/3219819.3220096)
